@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#100b0b">
+    <meta name="color-scheme" content="dark">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Diablo25D">
+    <meta name="application-name" content="Diablo25D">
+    <meta name="description" content="Chơi Diablo25D trực tiếp trên trình duyệt hoặc cài đặt như một ứng dụng.">
+    <title>Diablo25D</title>
+    <link rel="icon" href="./TemplateData/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="stylesheet" href="./TemplateData/style.css">
+    <link rel="stylesheet" href="./styles/game-shell.css">
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width="960" height="600" tabindex="-1" aria-label="Diablo25D game"></canvas>
+      <div id="unity-loading-bar" role="status" aria-live="polite" aria-label="Đang tải game">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div>
+      </div>
+      <div id="unity-warning" hidden></div>
+      <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <button id="unity-fullscreen-button" type="button" aria-label="Toàn màn hình"></button>
+        <div id="unity-build-title">Diablo25D</div>
+      </div>
+    </div>
+
+    <noscript>Trình duyệt phải bật JavaScript để chạy game.</noscript>
+    <script>
+      "use strict";
+
+      const GAME_BUILD_VERSION = "20260825-755202b02161";
+      const versionedUrl = (url) => `${url}${url.includes("?") ? "&" : "?"}v=${encodeURIComponent(GAME_BUILD_VERSION)}`;
+
+      function unityShowBanner(message, type) {
+        const warningBanner = document.querySelector("#unity-warning");
+        const item = document.createElement("div");
+        item.textContent = message;
+        item.className = `unity-message unity-message-${type || "info"}`;
+        warningBanner.appendChild(item);
+        warningBanner.hidden = false;
+        if (type !== "error") {
+          window.setTimeout(() => {
+            item.remove();
+            warningBanner.hidden = warningBanner.children.length === 0;
+          }, 5000);
+        }
+      }
+
+      async function startUnity() {
+        const canvas = document.querySelector("#unity-canvas");
+        const container = document.querySelector("#unity-container");
+        const loadingBar = document.querySelector("#unity-loading-bar");
+        const progressBar = document.querySelector("#unity-progress-bar-full");
+        const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+        const build = globalThis.UNITY_BUILD_CONFIG;
+        if (!build) throw new Error("Không tìm thấy cấu hình Unity WebGL.");
+
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || matchMedia("(pointer: coarse)").matches;
+        container.className = isMobile ? "unity-mobile" : "unity-desktop";
+        canvas.className = isMobile ? "unity-mobile" : "unity-desktop";
+
+        const config = {
+          arguments: [],
+          dataUrl: versionedUrl(build.dataUrl),
+          frameworkUrl: versionedUrl(build.frameworkUrl),
+          codeUrl: versionedUrl(build.codeUrl),
+          streamingAssetsUrl: build.streamingAssetsUrl,
+          companyName: build.companyName,
+          productName: build.productName,
+          productVersion: GAME_BUILD_VERSION,
+          showBanner: unityShowBanner,
+        };
+        if (isMobile) config.devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+        loadingBar.style.display = "block";
+        const loader = document.createElement("script");
+        loader.src = versionedUrl(build.loaderUrl);
+        loader.async = true;
+        loader.onerror = () => unityShowBanner(`Không thể tải Unity loader: ${build.loaderUrl}`, "error");
+        loader.onload = async () => {
+          try {
+            const unityInstance = await createUnityInstance(canvas, config, (progress) => {
+              progressBar.style.width = `${100 * progress}%`;
+            });
+            loadingBar.style.display = "none";
+            fullscreenButton.addEventListener("click", () => unityInstance.SetFullscreen(1));
+          } catch (error) {
+            loadingBar.style.display = "none";
+            unityShowBanner(error instanceof Error ? error.message : String(error), "error");
+          }
+        };
+        document.body.appendChild(loader);
+      }
+
+      async function registerServiceWorker() {
+        if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+        try {
+          const registration = await navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache: "none" });
+          await registration.update();
+        } catch (error) {
+          console.warn("Service worker registration failed:", error);
+        }
+      }
+
+      const configScript = document.createElement("script");
+      configScript.src = versionedUrl("./unity-build-config.js");
+      configScript.onload = () => startUnity().catch((error) => unityShowBanner(error.message, "error"));
+      configScript.onerror = () => unityShowBanner("Không thể tải cấu hình Unity WebGL.", "error");
+      document.body.appendChild(configScript);
+      registerServiceWorker();
+    </script>
+  </body>
+</html>

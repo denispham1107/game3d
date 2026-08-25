@@ -1,0 +1,45 @@
+{
+  "version": "20260825-755202b02161",
+  "generatedAt": "2026-08-25T18:08:49.909Z",
+  "entrypoints": {
+    "loaderUrl": "Build/diablo-webmobile.loader.js",
+    "dataUrl": "Build/diablo-webmobile.data",
+    "frameworkUrl": "Build/diablo-webmobile.framework.js",
+    "codeUrl": "Build/diablo-webmobile.wasm"
+  },
+  "assets": [
+    {
+      "output": "Build/diablo-webmobile.data",
+      "encoding": "br",
+      "parts": [
+        "Build/diablo-webmobile.data.br.part001",
+        "Build/diablo-webmobile.data.br.part002"
+      ],
+      "sourceSha256": "e1fd3c26413161db9eb337bf9283287521d594748ac6f1028544ffae93c4ea5f"
+    },
+    {
+      "output": "Build/diablo-webmobile.framework.js",
+      "encoding": "br",
+      "parts": [
+        "Build/diablo-webmobile.framework.js.br"
+      ],
+      "sourceSha256": "e3eac74942b86da876fe2ac592a983359efea93b87771ab8331b0c137038bb87"
+    },
+    {
+      "output": "Build/diablo-webmobile.loader.js",
+      "encoding": "identity",
+      "parts": [
+        "Build/diablo-webmobile.loader.js"
+      ],
+      "sourceSha256": "21af18638133369d620131694635dda76e5f176f9ddc48c30fb1a9fc08c2f98f"
+    },
+    {
+      "output": "Build/diablo-webmobile.wasm",
+      "encoding": "br",
+      "parts": [
+        "Build/diablo-webmobile.wasm.br"
+      ],
+      "sourceSha256": "5990b1dfe450803a061a97b6fccaaa1d6c0aaed5b455ddef56e9e69ce6856976"
+    }
+  ]
+}

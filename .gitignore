@@ -1,0 +1,18 @@
+# Unity ZIP files are local update inputs; the imported runtime is committed.
+*.zip
+*.7z
+*.rar
+
+# Generated deployment output and temporary update directories.
+_site/
+.unity-update-*/
+*.tmp
+
+# Unity diagnostic output explicitly marked as not shippable.
+*_BurstDebugInformation_DoNotShip/
+
+# Local/editor noise.
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
