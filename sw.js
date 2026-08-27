@@ -1,10 +1,10 @@
 "use strict";
 
-const GAME_BUILD_VERSION = "20260825-755202b02161";
+const GAME_BUILD_VERSION = "20260827-565ce71b525c";
 const CACHE_PREFIX = "diablo25d-shell-";
 const SHELL_CACHE = `${CACHE_PREFIX}${GAME_BUILD_VERSION}`;
 const APP_SHELL = [
-  "./", "./index.html", "./manifest.webmanifest", "./unity-build-config.js",
+  "./", "./index.html", "./manifest.webmanifest",
   "./styles/game-shell.css", "./TemplateData/style.css", "./TemplateData/favicon.ico",
   "./TemplateData/unity-logo-dark.png", "./TemplateData/unity-logo-title-footer.png",
   "./TemplateData/progress-bar-empty-dark.png", "./TemplateData/progress-bar-full-dark.png",

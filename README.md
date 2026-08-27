@@ -12,7 +12,7 @@
 
 Unity WebGL + GitHub Pages + PWA. GitHub Actions chuẩn bị các asset WebGL không nén, kiểm tra header `.data`/`.wasm`, rồi deploy artifact lên GitHub Pages.
 
-Build nguồn có thể giữ file nén Brotli. Asset lớn hơn giới hạn file của GitHub được chia thành các phần nhỏ; workflow tự ghép và giải nén khi deploy. Website không phụ thuộc `play.unity.com`.
+Build nguồn có thể dùng Brotli (`.br`) hoặc Unity Decompression Fallback (`.unityweb`). Asset lớn được chia thành các phần dưới 50 MiB; workflow tự ghép, giải nén khi cần và kiểm tra nội dung trước khi deploy. Website không phụ thuộc `play.unity.com`.
 
 ## Cách cập nhật game
 
@@ -36,7 +36,7 @@ ZIP là input cục bộ và được `.gitignore` bỏ qua. Script mặc địn
 
 - `index.html`, `styles/game-shell.css`: WebGL wrapper responsive/fullscreen.
 - `manifest.webmanifest`, `sw.js`, `icons/`: PWA cho iOS, Android và desktop.
-- `unity-build-config.js`, `unity-assets.json`: cấu hình build được sinh tự động.
+- `unity-build-config.js`, `unity-assets.json`: cấu hình build được sinh tự động; cấu hình runtime cũng được nhúng vào `index.html` để tránh cache mismatch.
 - `Build/`, `TemplateData/`, `StreamingAssets/`: runtime Unity.
 - `.github/workflows/deploy-pages.yml`: build và deploy GitHub Pages.
 - `scripts/prepare-pages.mjs`: ghép, giải nén và kiểm tra artifact Pages.

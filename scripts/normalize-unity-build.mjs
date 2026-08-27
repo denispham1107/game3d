@@ -3,7 +3,8 @@ import { createReadStream } from "node:fs";
 import { readFile, readdir, rename, rm, stat, unlink, writeFile } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
-const PART_SIZE = 64 * 1024 * 1024;
+// Stay below GitHub's 50 MiB recommendation as well as its 100 MiB hard limit.
+const PART_SIZE = 48 * 1024 * 1024;
 
 function argument(name, fallback) {
   const index = process.argv.indexOf(name);
@@ -135,7 +136,14 @@ for (const fileName of ["index.html", "sw.js"]) {
   const text = await readFile(path, "utf8");
   const replaced = text.replace(/const GAME_BUILD_VERSION = "[^"]+";/, `const GAME_BUILD_VERSION = "${version}";`);
   if (text === replaced) throw new Error(`${fileName} does not contain the GAME_BUILD_VERSION marker.`);
-  await writeFile(path, replaced);
+  let finalText = replaced;
+  if (fileName === "index.html") {
+    const configBlock = `// UNITY_BUILD_CONFIG_START\n      const UNITY_BUILD_CONFIG = Object.freeze(${JSON.stringify(runtimeConfig, null, 2).replaceAll("\n", "\n      ")});\n      // UNITY_BUILD_CONFIG_END`;
+    const withConfig = finalText.replace(/\/\/ UNITY_BUILD_CONFIG_START[\s\S]*?\/\/ UNITY_BUILD_CONFIG_END/, configBlock);
+    if (withConfig === finalText) throw new Error("index.html does not contain the inline Unity build config markers.");
+    finalText = withConfig;
+  }
+  await writeFile(path, finalText);
 }
 
 console.log(`Normalized ${assets.length} Unity assets as build ${version}.`);

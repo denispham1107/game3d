@@ -37,7 +37,19 @@
     <script>
       "use strict";
 
-      const GAME_BUILD_VERSION = "20260825-755202b02161";
+      const GAME_BUILD_VERSION = "20260827-565ce71b525c";
+      // UNITY_BUILD_CONFIG_START
+      const UNITY_BUILD_CONFIG = Object.freeze({
+        "loaderUrl": "Build/db-mobile4.loader.js",
+        "dataUrl": "Build/db-mobile4.data.unityweb",
+        "frameworkUrl": "Build/db-mobile4.framework.js.unityweb",
+        "codeUrl": "Build/db-mobile4.wasm.unityweb",
+        "streamingAssetsUrl": "StreamingAssets",
+        "companyName": "DefaultCompany",
+        "productName": "Diablo25D",
+        "unityProductVersion": "1.0"
+      });
+      // UNITY_BUILD_CONFIG_END
       const versionedUrl = (url) => `${url}${url.includes("?") ? "&" : "?"}v=${encodeURIComponent(GAME_BUILD_VERSION)}`;
 
       function unityShowBanner(message, type) {
@@ -61,7 +73,7 @@
         const loadingBar = document.querySelector("#unity-loading-bar");
         const progressBar = document.querySelector("#unity-progress-bar-full");
         const fullscreenButton = document.querySelector("#unity-fullscreen-button");
-        const build = globalThis.UNITY_BUILD_CONFIG;
+        const build = UNITY_BUILD_CONFIG;
         if (!build) throw new Error("Không tìm thấy cấu hình Unity WebGL.");
 
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || matchMedia("(pointer: coarse)").matches;
@@ -111,11 +123,7 @@
         }
       }
 
-      const configScript = document.createElement("script");
-      configScript.src = versionedUrl("./unity-build-config.js");
-      configScript.onload = () => startUnity().catch((error) => unityShowBanner(error.message, "error"));
-      configScript.onerror = () => unityShowBanner("Không thể tải cấu hình Unity WebGL.", "error");
-      document.body.appendChild(configScript);
+      startUnity().catch((error) => unityShowBanner(error.message, "error"));
       registerServiceWorker();
     </script>
   </body>

@@ -1,45 +1,46 @@
 {
-  "version": "20260825-755202b02161",
-  "generatedAt": "2026-08-25T18:08:49.909Z",
+  "version": "20260827-565ce71b525c",
+  "generatedAt": "2026-08-27T20:46:39.041Z",
   "entrypoints": {
-    "loaderUrl": "Build/diablo-webmobile.loader.js",
-    "dataUrl": "Build/diablo-webmobile.data",
-    "frameworkUrl": "Build/diablo-webmobile.framework.js",
-    "codeUrl": "Build/diablo-webmobile.wasm"
+    "loaderUrl": "Build/db-mobile4.loader.js",
+    "dataUrl": "Build/db-mobile4.data.unityweb",
+    "frameworkUrl": "Build/db-mobile4.framework.js.unityweb",
+    "codeUrl": "Build/db-mobile4.wasm.unityweb"
   },
   "assets": [
     {
-      "output": "Build/diablo-webmobile.data",
-      "encoding": "br",
-      "parts": [
-        "Build/diablo-webmobile.data.br.part001",
-        "Build/diablo-webmobile.data.br.part002"
-      ],
-      "sourceSha256": "e1fd3c26413161db9eb337bf9283287521d594748ac6f1028544ffae93c4ea5f"
-    },
-    {
-      "output": "Build/diablo-webmobile.framework.js",
-      "encoding": "br",
-      "parts": [
-        "Build/diablo-webmobile.framework.js.br"
-      ],
-      "sourceSha256": "e3eac74942b86da876fe2ac592a983359efea93b87771ab8331b0c137038bb87"
-    },
-    {
-      "output": "Build/diablo-webmobile.loader.js",
+      "output": "Build/db-mobile4.data.unityweb",
       "encoding": "identity",
       "parts": [
-        "Build/diablo-webmobile.loader.js"
+        "Build/db-mobile4.data.unityweb.part001",
+        "Build/db-mobile4.data.unityweb.part002",
+        "Build/db-mobile4.data.unityweb.part003"
       ],
-      "sourceSha256": "21af18638133369d620131694635dda76e5f176f9ddc48c30fb1a9fc08c2f98f"
+      "sourceSha256": "201338af2f51be7e8de61839ccac504d1c6c5c05d94ace7c9e8ac76e913cc43e"
     },
     {
-      "output": "Build/diablo-webmobile.wasm",
-      "encoding": "br",
+      "output": "Build/db-mobile4.framework.js.unityweb",
+      "encoding": "identity",
       "parts": [
-        "Build/diablo-webmobile.wasm.br"
+        "Build/db-mobile4.framework.js.unityweb"
       ],
-      "sourceSha256": "5990b1dfe450803a061a97b6fccaaa1d6c0aaed5b455ddef56e9e69ce6856976"
+      "sourceSha256": "e9e3623fc0c15a0a1222d4467940821f50829acefd5acabfb54211dc784f0414"
+    },
+    {
+      "output": "Build/db-mobile4.loader.js",
+      "encoding": "identity",
+      "parts": [
+        "Build/db-mobile4.loader.js"
+      ],
+      "sourceSha256": "2894064c723110b4d96610f4b07292c5f82e08366fcaea09219b1dfc332a09a3"
+    },
+    {
+      "output": "Build/db-mobile4.wasm.unityweb",
+      "encoding": "identity",
+      "parts": [
+        "Build/db-mobile4.wasm.unityweb"
+      ],
+      "sourceSha256": "b551dc053cd7566facb5d06d02cb021f2ea90b4930367ce632b7097ec52e23b0"
     }
   ]
 }

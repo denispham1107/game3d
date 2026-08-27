@@ -29,7 +29,7 @@ html, body {
   position: fixed; right: max(10px, env(safe-area-inset-right)); bottom: max(10px, env(safe-area-inset-bottom));
   z-index: 10; height: 38px; padding: 4px 6px; border-radius: 8px; background: rgba(16, 11, 11, 0.68);
 }
-#unity-fullscreen-button { padding: 0; border-radius: 4px; }
+#unity-fullscreen-button { padding: 0; border: 0; border-radius: 4px; background-color: transparent; }
 #unity-fullscreen-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .unity-mobile #unity-footer { display: none; }
 noscript {
