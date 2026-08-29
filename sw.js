@@ -1,12 +1,12 @@
 "use strict";
 
-const GAME_BUILD_VERSION = "20260829-541310327f2e";
-const CACHE_PREFIX = "diablo25d-shell-";
+const GAME_BUILD_VERSION = "20260829-phuthuy3d-icons-v1";
+const CACHE_PREFIX = "phuthuy3d-shell-";
+const LEGACY_CACHE_PREFIXES = ["diablo25d-shell-"];
 const SHELL_CACHE = `${CACHE_PREFIX}${GAME_BUILD_VERSION}`;
 const APP_SHELL = [
   "./", "./index.html", "./manifest.webmanifest",
-  "./styles/game-shell.css", "./TemplateData/style.css", "./TemplateData/favicon.ico",
-  "./TemplateData/unity-logo-dark.png", "./TemplateData/unity-logo-title-footer.png",
+  "./styles/game-shell.css", "./TemplateData/style.css",
   "./TemplateData/progress-bar-empty-dark.png", "./TemplateData/progress-bar-full-dark.png",
   "./TemplateData/fullscreen-button.png", "./icons/icon-192.png", "./icons/icon-512.png",
   "./icons/icon-512-maskable.png", "./icons/apple-touch-icon.png"
@@ -23,7 +23,9 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const names = await caches.keys();
-    await Promise.all(names.filter((name) => name.startsWith(CACHE_PREFIX) && name !== SHELL_CACHE).map((name) => caches.delete(name)));
+    await Promise.all(names.filter((name) => (
+      name.startsWith(CACHE_PREFIX) || LEGACY_CACHE_PREFIXES.some((prefix) => name.startsWith(prefix))
+    ) && name !== SHELL_CACHE).map((name) => caches.delete(name)));
     await self.clients.claim();
   })());
 });

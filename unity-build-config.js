@@ -6,6 +6,6 @@ globalThis.UNITY_BUILD_CONFIG = Object.freeze({
   "codeUrl": "Build/db-mobile1.wasm.unityweb",
   "streamingAssetsUrl": "StreamingAssets",
   "companyName": "DefaultCompany",
-  "productName": "Diablo25D",
+  "productName": "PhuThuy3D",
   "unityProductVersion": "1.0"
 });

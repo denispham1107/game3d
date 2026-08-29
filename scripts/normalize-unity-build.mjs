@@ -14,6 +14,7 @@ function argument(name, fallback) {
 const repoRoot = resolve(argument("--repo", "."));
 const unityIndexPath = resolve(argument("--unity-index", resolve(repoRoot, "index.html")));
 const buildRoot = resolve(repoRoot, "Build");
+const webProductName = argument("--product-name", "PhuThuy3D");
 
 function assertInside(root, target, label) {
   const path = resolve(target);
@@ -125,7 +126,9 @@ const runtimeConfig = {
   ...entrypoints,
   streamingAssetsUrl: generated.streamingAssetsUrl,
   companyName: generated.companyName,
-  productName: generated.productName,
+  // Keep the web/PWA brand stable when future Unity ZIPs retain an older
+  // Player Settings product name.
+  productName: webProductName,
   unityProductVersion: generated.unityProductVersion,
 };
 await writeFile(resolve(repoRoot, "unity-assets.json"), `${JSON.stringify(manifest, null, 2)}\n`);

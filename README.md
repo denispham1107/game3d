@@ -1,4 +1,4 @@
-# Diablo25D WebGL
+# PhuThuy3D WebGL
 
 ## Game URL
 
@@ -36,6 +36,7 @@ ZIP là input cục bộ và được `.gitignore` bỏ qua. Script mặc địn
 
 - `index.html`, `styles/game-shell.css`: WebGL wrapper responsive/fullscreen.
 - `manifest.webmanifest`, `sw.js`, `icons/`: PWA cho iOS, Android và desktop.
+- Tên và icon web/PWA là `PhuThuy3D`; script cập nhật giữ thương hiệu này ngay cả khi ZIP Unity còn dùng tên Player Settings cũ.
 - `unity-build-config.js`, `unity-assets.json`: cấu hình build được sinh tự động; cấu hình runtime cũng được nhúng vào `index.html` để tránh cache mismatch.
 - `Build/`, `TemplateData/`, `StreamingAssets/`: runtime Unity.
 - `.github/workflows/deploy-pages.yml`: build và deploy GitHub Pages.
