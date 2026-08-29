@@ -1,6 +1,6 @@
 "use strict";
 
-const GAME_BUILD_VERSION = "20260830-wizard-icons-v2";
+const GAME_BUILD_VERSION = "20260829-a91eb0fbd354";
 const CACHE_PREFIX = "phuthuy3d-shell-";
 const LEGACY_CACHE_PREFIXES = ["diablo25d-shell-"];
 const SHELL_CACHE = `${CACHE_PREFIX}${GAME_BUILD_VERSION}`;
