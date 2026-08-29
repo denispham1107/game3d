@@ -1,6 +1,6 @@
 "use strict";
 
-const GAME_BUILD_VERSION = "20260829-58be3da562fb";
+const GAME_BUILD_VERSION = "20260829-dcbbe339b92f";
 const CACHE_PREFIX = "phuthuy3d-shell-";
 const LEGACY_CACHE_PREFIXES = ["diablo25d-shell-"];
 const SHELL_CACHE = `${CACHE_PREFIX}${GAME_BUILD_VERSION}`;
