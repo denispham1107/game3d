@@ -1,46 +1,46 @@
 {
-  "version": "20260827-565ce71b525c",
-  "generatedAt": "2026-08-27T20:46:39.041Z",
+  "version": "20260829-541310327f2e",
+  "generatedAt": "2026-08-29T03:23:23.299Z",
   "entrypoints": {
-    "loaderUrl": "Build/db-mobile4.loader.js",
-    "dataUrl": "Build/db-mobile4.data.unityweb",
-    "frameworkUrl": "Build/db-mobile4.framework.js.unityweb",
-    "codeUrl": "Build/db-mobile4.wasm.unityweb"
+    "loaderUrl": "Build/db-mobile1.loader.js",
+    "dataUrl": "Build/db-mobile1.data.unityweb",
+    "frameworkUrl": "Build/db-mobile1.framework.js.unityweb",
+    "codeUrl": "Build/db-mobile1.wasm.unityweb"
   },
   "assets": [
     {
-      "output": "Build/db-mobile4.data.unityweb",
+      "output": "Build/db-mobile1.data.unityweb",
       "encoding": "identity",
       "parts": [
-        "Build/db-mobile4.data.unityweb.part001",
-        "Build/db-mobile4.data.unityweb.part002",
-        "Build/db-mobile4.data.unityweb.part003"
+        "Build/db-mobile1.data.unityweb.part001",
+        "Build/db-mobile1.data.unityweb.part002",
+        "Build/db-mobile1.data.unityweb.part003"
       ],
-      "sourceSha256": "201338af2f51be7e8de61839ccac504d1c6c5c05d94ace7c9e8ac76e913cc43e"
+      "sourceSha256": "7ccb2f562e6bef38caba17fe324b8183a4d57d7b85ddf9e39dfdff7046d4ec76"
     },
     {
-      "output": "Build/db-mobile4.framework.js.unityweb",
+      "output": "Build/db-mobile1.framework.js.unityweb",
       "encoding": "identity",
       "parts": [
-        "Build/db-mobile4.framework.js.unityweb"
+        "Build/db-mobile1.framework.js.unityweb"
       ],
       "sourceSha256": "e9e3623fc0c15a0a1222d4467940821f50829acefd5acabfb54211dc784f0414"
     },
     {
-      "output": "Build/db-mobile4.loader.js",
+      "output": "Build/db-mobile1.loader.js",
       "encoding": "identity",
       "parts": [
-        "Build/db-mobile4.loader.js"
+        "Build/db-mobile1.loader.js"
       ],
-      "sourceSha256": "2894064c723110b4d96610f4b07292c5f82e08366fcaea09219b1dfc332a09a3"
+      "sourceSha256": "ff849b5d213da4c9ba147fc6986625456495215d051deb05c2e84e8cf4279b9c"
     },
     {
-      "output": "Build/db-mobile4.wasm.unityweb",
+      "output": "Build/db-mobile1.wasm.unityweb",
       "encoding": "identity",
       "parts": [
-        "Build/db-mobile4.wasm.unityweb"
+        "Build/db-mobile1.wasm.unityweb"
       ],
-      "sourceSha256": "b551dc053cd7566facb5d06d02cb021f2ea90b4930367ce632b7097ec52e23b0"
+      "sourceSha256": "073dc56250460488130abe64396c3d64610c70c6f08d175b1100426a04d2a67e"
     }
   ]
 }

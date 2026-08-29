@@ -1,6 +1,6 @@
 "use strict";
 
-const GAME_BUILD_VERSION = "20260827-565ce71b525c";
+const GAME_BUILD_VERSION = "20260829-541310327f2e";
 const CACHE_PREFIX = "diablo25d-shell-";
 const SHELL_CACHE = `${CACHE_PREFIX}${GAME_BUILD_VERSION}`;
 const APP_SHELL = [
