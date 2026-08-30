@@ -1,48 +1,49 @@
 {
-  "version": "20260830-33653575e01e",
-  "generatedAt": "2026-08-30T08:49:07.818Z",
+  "version": "20260830-fb4d7afe748a",
+  "generatedAt": "2026-08-30T15:00:11.308Z",
   "entrypoints": {
-    "loaderUrl": "Build/phuthuy-mobile3.loader.js",
-    "dataUrl": "Build/phuthuy-mobile3.data.unityweb",
-    "frameworkUrl": "Build/phuthuy-mobile3.framework.js.unityweb",
-    "codeUrl": "Build/phuthuy-mobile3.wasm.unityweb"
+    "loaderUrl": "Build/phuthuy-mobile4.loader.js",
+    "dataUrl": "Build/phuthuy-mobile4.data.unityweb",
+    "frameworkUrl": "Build/phuthuy-mobile4.framework.js.unityweb",
+    "codeUrl": "Build/phuthuy-mobile4.wasm.unityweb"
   },
   "assets": [
     {
-      "output": "Build/phuthuy-mobile3.data.unityweb",
+      "output": "Build/phuthuy-mobile4.data.unityweb",
       "encoding": "identity",
       "parts": [
-        "Build/phuthuy-mobile3.data.unityweb.part001",
-        "Build/phuthuy-mobile3.data.unityweb.part002",
-        "Build/phuthuy-mobile3.data.unityweb.part003",
-        "Build/phuthuy-mobile3.data.unityweb.part004",
-        "Build/phuthuy-mobile3.data.unityweb.part005"
+        "Build/phuthuy-mobile4.data.unityweb.part001",
+        "Build/phuthuy-mobile4.data.unityweb.part002",
+        "Build/phuthuy-mobile4.data.unityweb.part003",
+        "Build/phuthuy-mobile4.data.unityweb.part004",
+        "Build/phuthuy-mobile4.data.unityweb.part005",
+        "Build/phuthuy-mobile4.data.unityweb.part006"
       ],
-      "sourceSha256": "eece4d8e24a8ed28f301f8e488ec9ab5bdfd68585e6483dc6fecca17d2e136e0"
+      "sourceSha256": "1ba74e90cd500f26925d8796b7ba4d059687f1426b5c6b0042ad755fe3706279"
     },
     {
-      "output": "Build/phuthuy-mobile3.framework.js.unityweb",
+      "output": "Build/phuthuy-mobile4.framework.js.unityweb",
       "encoding": "identity",
       "parts": [
-        "Build/phuthuy-mobile3.framework.js.unityweb"
+        "Build/phuthuy-mobile4.framework.js.unityweb"
       ],
       "sourceSha256": "e9e3623fc0c15a0a1222d4467940821f50829acefd5acabfb54211dc784f0414"
     },
     {
-      "output": "Build/phuthuy-mobile3.loader.js",
+      "output": "Build/phuthuy-mobile4.loader.js",
       "encoding": "identity",
       "parts": [
-        "Build/phuthuy-mobile3.loader.js"
+        "Build/phuthuy-mobile4.loader.js"
       ],
-      "sourceSha256": "b792e63e5935c2f3aefed96d84321893dca1086bf56f12cc7b40d3ff06dae9ae"
+      "sourceSha256": "404b112e946ed25dd5c415d0af1060973ecf7636fed579ac8f09dfe3ba6dcb98"
     },
     {
-      "output": "Build/phuthuy-mobile3.wasm.unityweb",
+      "output": "Build/phuthuy-mobile4.wasm.unityweb",
       "encoding": "identity",
       "parts": [
-        "Build/phuthuy-mobile3.wasm.unityweb"
+        "Build/phuthuy-mobile4.wasm.unityweb"
       ],
-      "sourceSha256": "ebe6b3112a33878983e8adf59f9e132a854d39916cec68df63bab97d738dae93"
+      "sourceSha256": "acbe19ea0729e4ff92b67719e2332ca86143c7f15a0952a2111cbea7c145859e"
     }
   ]
 }
