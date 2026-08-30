@@ -37,7 +37,7 @@
     <script>
       "use strict";
 
-      const GAME_BUILD_VERSION = "20260830-e904ec7fb89d";
+      const GAME_BUILD_VERSION = "20260830-e904ec7fb89d-retina1";
       // UNITY_BUILD_CONFIG_START
       const UNITY_BUILD_CONFIG = Object.freeze({
         "loaderUrl": "Build/phuthuy-mobile4.loader.js",
@@ -65,6 +65,39 @@
             warningBanner.hidden = warningBanner.children.length === 0;
           }, 5000);
         }
+      }
+
+      function enableIOSRetinaRendering(canvas) {
+        // Render at the device's native scale whenever it fits the GPU pixel
+        // budget. Current iPhones and iPads reach Retina quality, while future
+        // larger displays are capped instead of allocating unbounded buffers.
+        const MAX_RENDER_PIXELS = 5_800_000;
+        let resizeTimer;
+
+        const resizeRenderTarget = () => {
+          const bounds = canvas.getBoundingClientRect();
+          const cssWidth = Math.max(1, bounds.width);
+          const cssHeight = Math.max(1, bounds.height);
+          const nativeDpr = Math.max(1, window.devicePixelRatio || 1);
+          const budgetDpr = Math.sqrt(MAX_RENDER_PIXELS / (cssWidth * cssHeight));
+          const renderDpr = Math.max(1, Math.min(nativeDpr, budgetDpr));
+          const renderWidth = Math.round(cssWidth * renderDpr);
+          const renderHeight = Math.round(cssHeight * renderDpr);
+
+          if (canvas.width !== renderWidth) canvas.width = renderWidth;
+          if (canvas.height !== renderHeight) canvas.height = renderHeight;
+          canvas.dataset.renderScale = renderDpr.toFixed(2);
+        };
+
+        const scheduleResize = () => {
+          window.clearTimeout(resizeTimer);
+          resizeTimer = window.setTimeout(resizeRenderTarget, 120);
+        };
+
+        resizeRenderTarget();
+        window.addEventListener("resize", scheduleResize, { passive: true });
+        window.visualViewport?.addEventListener("resize", scheduleResize, { passive: true });
+        if ("ResizeObserver" in window) new ResizeObserver(scheduleResize).observe(canvas);
       }
 
       async function startUnity() {
@@ -95,9 +128,13 @@
         };
         if (isIOS) {
           // WebKit keeps Unity's unpacked .data file in memory. Avoid a second
-          // Cache Storage copy and limit Retina GPU buffers on iPhone/iPad.
+          // Cache Storage copy. Start with a small render target during the
+          // memory-heavy initialization, then enable adaptive Retina rendering.
           config.cacheControl = () => "no-store";
-          config.devicePixelRatio = 1;
+          config.matchWebGLToCanvasSize = false;
+          const bounds = canvas.getBoundingClientRect();
+          canvas.width = Math.max(1, Math.round(bounds.width));
+          canvas.height = Math.max(1, Math.round(bounds.height));
         } else if (isMobile) {
           config.devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
         }
@@ -113,6 +150,7 @@
               const unityInstance = await createUnityInstance(canvas, config, (progress) => {
                 progressBar.style.width = `${100 * progress}%`;
               });
+              if (isIOS) enableIOSRetinaRendering(canvas);
               loadingBar.style.display = "none";
               fullscreenButton.addEventListener("click", () => unityInstance.SetFullscreen(1));
               resolve(unityInstance);
