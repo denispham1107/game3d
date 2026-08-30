@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { readFile, readdir, rename, rm, stat, unlink, writeFile } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
+import { createBrotliDecompress, createGunzip } from "node:zlib";
 
 // Stay below GitHub's 50 MiB recommendation as well as its 100 MiB hard limit.
 const PART_SIZE = 48 * 1024 * 1024;
@@ -45,12 +46,48 @@ const generated = {
   unityProductVersion: matchValue(/productVersion\s*:\s*["']([^"']*)/, "productVersion", "1.0"),
 };
 
-function normalizedOutput(sourcePath) {
+function canDecodePrefix(path, createDecoder) {
+  return new Promise((resolvePromise) => {
+    const source = createReadStream(path, { highWaterMark: 64 * 1024 });
+    const decoder = createDecoder();
+    let settled = false;
+
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      source.unpipe(decoder);
+      source.destroy();
+      decoder.destroy();
+      resolvePromise(result);
+    };
+
+    source.once("error", () => finish(false));
+    decoder.once("error", () => finish(false));
+    decoder.once("end", () => finish(false));
+    decoder.once("data", (chunk) => finish(chunk.length > 0));
+    source.pipe(decoder);
+  });
+}
+
+async function unityWebEncoding(path) {
+  if (!path.endsWith(".unityweb")) return null;
+  if (await canDecodePrefix(path, createBrotliDecompress)) return "br";
+  if (await canDecodePrefix(path, createGunzip)) return "gzip";
+  return null;
+}
+
+async function normalizedOutput(sourcePath, sourceFile) {
   if (sourcePath.endsWith(".br")) return { output: sourcePath.slice(0, -3), encoding: "br" };
   if (sourcePath.endsWith(".gz")) return { output: sourcePath.slice(0, -3), encoding: "gzip" };
+  const fallbackEncoding = await unityWebEncoding(sourceFile);
+  if (fallbackEncoding) {
+    // Unity Decompression Fallback uses .unityweb files and otherwise expands
+    // both the compressed and decoded buffers in the browser. Decode them in
+    // the Pages build job instead, which lowers peak memory on iOS/iPadOS.
+    return { output: sourcePath.slice(0, -".unityweb".length), encoding: fallbackEncoding };
+  }
   return { output: sourcePath, encoding: "identity" };
 }
-const normalizeEntrypoint = (path) => normalizedOutput(path).output.replaceAll("\\", "/");
 
 async function filesRecursively(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -92,33 +129,35 @@ async function splitFile(path) {
 const buildFiles = await filesRecursively(buildRoot);
 if (buildFiles.length === 0) throw new Error("Build directory is empty.");
 const assets = [];
+const assetBySource = new Map();
 for (const sourceFile of buildFiles) {
   const sourceRelative = relative(repoRoot, sourceFile).replaceAll("\\", "/");
-  const { output, encoding } = normalizedOutput(sourceRelative);
+  const { output, encoding } = await normalizedOutput(sourceRelative, sourceFile);
   const sourceSha256 = await hashFile(sourceFile);
   const fileSize = (await stat(sourceFile)).size;
   const partPaths = fileSize > PART_SIZE ? await splitFile(sourceFile) : [sourceFile];
-  assets.push({
+  const asset = {
     output,
     encoding,
     parts: partPaths.map((path) => relative(repoRoot, path).replaceAll("\\", "/")),
     sourceSha256,
-  });
+  };
+  if (assetBySource.has(sourceRelative)) throw new Error(`Duplicate Unity source asset: ${sourceRelative}`);
+  if (assets.some((candidate) => candidate.output === output)) throw new Error(`Duplicate Unity output asset: ${output}`);
+  assets.push(asset);
+  assetBySource.set(sourceRelative, asset);
 }
 
 const combinedHash = createHash("sha256");
 for (const asset of assets) combinedHash.update(`${asset.output}:${asset.sourceSha256}\n`);
 const date = new Date().toISOString().slice(0, 10).replaceAll("-", "");
 const version = `${date}-${combinedHash.digest("hex").slice(0, 12)}`;
-const entrypoints = {
-  loaderUrl: normalizeEntrypoint(generated.loaderUrl),
-  dataUrl: normalizeEntrypoint(generated.dataUrl),
-  frameworkUrl: normalizeEntrypoint(generated.frameworkUrl),
-  codeUrl: normalizeEntrypoint(generated.codeUrl),
-};
-
-for (const [label, path] of Object.entries(entrypoints)) {
-  if (!assets.some((asset) => asset.output === path)) throw new Error(`Normalized ${label} is missing: ${path}`);
+const entrypoints = {};
+for (const label of ["loaderUrl", "dataUrl", "frameworkUrl", "codeUrl"]) {
+  const sourcePath = generated[label].replaceAll("\\", "/");
+  const asset = assetBySource.get(sourcePath);
+  if (!asset) throw new Error(`Normalized ${label} is missing: ${sourcePath}`);
+  entrypoints[label] = asset.output;
 }
 
 const manifest = { version, generatedAt: new Date().toISOString(), entrypoints, assets };

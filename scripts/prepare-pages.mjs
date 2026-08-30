@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { createReadStream, createWriteStream } from "node:fs";
 import { cp, mkdir, open, readFile, rm, stat } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { Readable, Writable } from "node:stream";
+import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { createBrotliDecompress, createGunzip } from "node:zlib";
 
@@ -102,45 +102,9 @@ async function readHeader(path, length) {
   }
 }
 
-async function readUnityWebHeader(path, length) {
-  const decoders = [
-    ["brotli", createBrotliDecompress],
-    ["gzip", createGunzip],
-  ];
-  let lastError;
-
-  for (const [name, createDecoder] of decoders) {
-    const chunks = [];
-    let remaining = length;
-    const sink = new Writable({
-      write(chunk, _encoding, callback) {
-        if (remaining > 0) {
-          const slice = chunk.subarray(0, remaining);
-          chunks.push(slice);
-          remaining -= slice.length;
-        }
-        callback();
-      },
-    });
-
-    try {
-      await pipeline(createReadStream(path), createDecoder(), sink);
-      const header = Buffer.concat(chunks, length);
-      if (header.length !== length) throw new Error(`Decoded ${name} stream is too short.`);
-      return header;
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  throw new Error(`Could not decode Unity .unityweb asset ${path}: ${lastError?.message || "unknown compression"}`);
-}
-
 async function readRuntimeHeader(asset, length) {
-  const path = resolve(outputRoot, asset.output);
-  return asset.output.endsWith(".unityweb")
-    ? readUnityWebHeader(path, length)
-    : readHeader(path, length);
+  // Every output has already passed through its configured decoder above.
+  return readHeader(resolve(outputRoot, asset.output), length);
 }
 
 const dataHeader = await readRuntimeHeader(dataAsset, 16);

@@ -1,6 +1,6 @@
 "use strict";
 
-const GAME_BUILD_VERSION = "20260830-fb4d7afe748a";
+const GAME_BUILD_VERSION = "20260830-e904ec7fb89d";
 const CACHE_PREFIX = "phuthuy3d-shell-";
 const LEGACY_CACHE_PREFIXES = ["diablo25d-shell-"];
 const SHELL_CACHE = `${CACHE_PREFIX}${GAME_BUILD_VERSION}`;
@@ -65,7 +65,7 @@ self.addEventListener("fetch", (event) => {
   // Unity owns revalidation of its large data file; avoiding a second cache
   // prevents duplicate storage and stale cross-version asset combinations.
   if (url.pathname.includes("/Build/") || url.pathname.includes("/StreamingAssets/")) {
-    event.respondWith(fetch(request, { cache: "no-cache" }));
+    event.respondWith(fetch(request, { cache: "no-store" }));
     return;
   }
   event.respondWith(shellAsset(request).catch(() => caches.match(request, { ignoreSearch: true })));

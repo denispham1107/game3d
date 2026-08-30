@@ -12,7 +12,9 @@
 
 Unity WebGL + GitHub Pages + PWA. GitHub Actions chuẩn bị các asset WebGL không nén, kiểm tra header `.data`/`.wasm`, rồi deploy artifact lên GitHub Pages.
 
-Build nguồn có thể dùng Brotli (`.br`) hoặc Unity Decompression Fallback (`.unityweb`). Asset lớn được chia thành các phần dưới 50 MiB; workflow tự ghép, giải nén khi cần và kiểm tra nội dung trước khi deploy. Website không phụ thuộc `play.unity.com`.
+Build nguồn có thể dùng Brotli (`.br`) hoặc Unity Decompression Fallback (`.unityweb`). Asset lớn được chia thành các phần dưới 50 MiB; workflow tự ghép, giải nén và đổi về `.data`/`.wasm`/`.js` trước khi deploy. Cách này tránh bộ giải nén JavaScript giữ đồng thời hai buffer rất lớn trong RAM, đặc biệt quan trọng với Safari trên iPhone/iPad. Website không phụ thuộc `play.unity.com`.
+
+Trên iOS/iPadOS, wrapper dùng `devicePixelRatio = 1`, không lưu bản sao Unity `.data` vào Cache Storage và chỉ cập nhật service worker sau khi game khởi tạo. Các tối ưu này giảm đỉnh RAM nhưng không thể thay thế việc tối ưu project Unity: nếu `.data` tiếp tục tăng, nên chuyển asset lớn sang Addressables/AssetBundles và chỉ tải khi cần.
 
 ## Cách cập nhật game
 
