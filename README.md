@@ -14,7 +14,7 @@ Unity WebGL + GitHub Pages + PWA. GitHub Actions chuẩn bị các asset WebGL k
 
 Build nguồn có thể dùng Brotli (`.br`) hoặc Unity Decompression Fallback (`.unityweb`). Asset lớn được chia thành các phần dưới 50 MiB; workflow tự ghép, giải nén và đổi về `.data`/`.wasm`/`.js` trước khi deploy. Cách này tránh bộ giải nén JavaScript giữ đồng thời hai buffer rất lớn trong RAM, đặc biệt quan trọng với Safari trên iPhone/iPad. Website không phụ thuộc `play.unity.com`.
 
-Trên iOS/iPadOS, wrapper không lưu bản sao Unity `.data` vào Cache Storage, khởi tạo với render target nhẹ rồi tự nâng lên Retina theo ngân sách điểm ảnh. Service worker chỉ cập nhật sau khi game khởi tạo. Cách này giữ hình ảnh sắc nét mà vẫn giảm đỉnh RAM lúc tải, nhưng không thể thay thế việc tối ưu project Unity: nếu `.data` tiếp tục tăng, nên chuyển asset lớn sang Addressables/AssetBundles và chỉ tải khi cần.
+Trên iOS/iPadOS, wrapper không lưu bản sao Unity `.data` vào Cache Storage, khởi tạo ở DPR 1 rồi tự nâng theo DPR của thiết bị với mức tối đa DPR 2 và ngân sách điểm ảnh. Android cũng tối đa DPR 2; desktop dùng DPR mặc định của trình duyệt. Service worker chỉ cập nhật sau khi game khởi tạo. Cách này giữ hình ảnh sắc nét mà vẫn giảm đỉnh RAM lúc tải, nhưng không thể thay thế việc tối ưu project Unity: nếu `.data` tiếp tục tăng, nên chuyển asset lớn sang Addressables/AssetBundles và chỉ tải khi cần.
 
 ## Cách cập nhật game
 

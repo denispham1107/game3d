@@ -37,7 +37,7 @@
     <script>
       "use strict";
 
-      const GAME_BUILD_VERSION = "20260830-df9c6f98c6f1";
+      const GAME_BUILD_VERSION = "20260830-df9c6f98c6f1-dpr2";
       // UNITY_BUILD_CONFIG_START
       const UNITY_BUILD_CONFIG = Object.freeze({
         "loaderUrl": "Build/phuthuy-mobile6.loader.js",
@@ -68,9 +68,8 @@
       }
 
       function enableIOSRetinaRendering(canvas) {
-        // Render at the device's native scale whenever it fits the GPU pixel
-        // budget. Current iPhones and iPads reach Retina quality, while future
-        // larger displays are capped instead of allocating unbounded buffers.
+        // Use the device scale after startup, capped at DPR 2 and by a GPU
+        // pixel budget so iPhone/iPad stay sharp without unbounded buffers.
         const MAX_RENDER_PIXELS = 5_800_000;
         let resizeTimer;
 
@@ -80,7 +79,7 @@
           const cssHeight = Math.max(1, bounds.height);
           const nativeDpr = Math.max(1, window.devicePixelRatio || 1);
           const budgetDpr = Math.sqrt(MAX_RENDER_PIXELS / (cssWidth * cssHeight));
-          const renderDpr = Math.max(1, Math.min(nativeDpr, budgetDpr));
+          const renderDpr = Math.max(1, Math.min(nativeDpr, 2, budgetDpr));
           const renderWidth = Math.round(cssWidth * renderDpr);
           const renderHeight = Math.round(cssHeight * renderDpr);
 
