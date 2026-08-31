@@ -37,8 +37,8 @@
     <script>
       "use strict";
 
-      const GAME_BUILD_VERSION = "20260901-a06fc6786ef1-iosadaptive1";
-      const IOS_RENDER_PROFILE_VERSION = "20260901-1";
+      const GAME_BUILD_VERSION = "20260901-a06fc6786ef1-iosadaptive2";
+      const IOS_RENDER_PROFILE_VERSION = "20260901-2";
       const IOS_RENDER_PROFILE_KEY = "phuthuy3d-ios-render-profile";
       const IOS_LAUNCH_STATE_KEY = "phuthuy3d-ios-launch-state";
       const IOS_PROFILE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -88,11 +88,7 @@
         }
       }
 
-      function getIOSRenderPlan(isIPhone) {
-        if (!isIPhone) {
-          return { tier: "ipad-retina", initialDpr: 2, shouldProbe: false };
-        }
-
+      function getIOSRenderPlan() {
         const now = Date.now();
         const previousLaunch = readLocalJson(IOS_LAUNCH_STATE_KEY);
         const previousLaunchWasInterrupted = previousLaunch
@@ -110,9 +106,9 @@
           if (saved.tier === "low") return { tier: "low", initialDpr: 1.25, shouldProbe: false };
         }
 
-        // Safari intentionally does not expose an exact iPhone generation.
-        // Four-core/older devices use the safe tier immediately; all other
-        // iPhones start balanced and are promoted only after a live frame test.
+        // Safari intentionally limits exact device identification. Four-core
+        // or older iOS/iPadOS devices use the safe tier immediately; all other
+        // devices start balanced and are promoted only after a live frame test.
         const logicalCores = Number(navigator.hardwareConcurrency) || 0;
         if (logicalCores > 0 && logicalCores <= 4) {
           return { tier: "low", initialDpr: 1.25, shouldProbe: false };
@@ -156,8 +152,8 @@
       }
 
       function enableIOSRetinaRendering(canvas, initialDpr) {
-        // iPad keeps Retina DPR. iPhone starts from a device-specific adaptive
-        // cap after Unity's DPR-1 initialization and may change cap at runtime.
+        // iPhone and iPad start from a device-specific adaptive cap after
+        // Unity's DPR-1 initialization and may change cap at runtime.
         const MAX_RENDER_PIXELS = 5_800_000;
         let dprCap = Math.max(1, Math.min(2, initialDpr || 2));
         let resizeTimer;
@@ -232,7 +228,7 @@
         });
       }
 
-      async function tuneIPhoneRendering(renderer, plan) {
+      async function tuneIOSRendering(renderer, plan) {
         if (plan.tier === "recovery" || plan.tier === "low") {
           renderer.setDprCap(1.25);
           rememberIOSRenderTier("low");
@@ -248,10 +244,9 @@
           return;
         }
 
-        // Ambiguous models (including iPhone 12/13, which share browser-visible
-        // characteristics) remain at DPR 1.5 unless the running Unity game is
-        // stable. A candidate Retina promotion is tested again and reverted if
-        // frame pacing degrades.
+        // Ambiguous iPhone/iPad models remain at DPR 1.5 unless the running
+        // Unity game is stable. A candidate Retina promotion is tested again
+        // and reverted if frame pacing degrades.
         const balancedHealth = await measureFrameHealth(6000);
         if (!balancedHealth.healthy) {
           renderer.setDprCap(1.25);
@@ -260,7 +255,7 @@
         }
 
         // Step through DPR 1.75 first. Requiring near-60 fps here prevents an
-        // older iPhone from making a risky jump straight from 1.5 to 2.
+        // weaker iOS/iPadOS device from jumping straight from 1.5 to 2.
         renderer.setDprCap(1.75);
         const candidateHealth = await measureFrameHealth(7000);
         if (candidateHealth.averageFps < 56 || candidateHealth.longFrameRatio > 0.05) {
@@ -290,8 +285,7 @@
 
         const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
           || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-        const isIPhone = /iPhone|iPod/i.test(navigator.userAgent);
-        const iosRenderPlan = isIOS ? getIOSRenderPlan(isIPhone) : null;
+        const iosRenderPlan = isIOS ? getIOSRenderPlan() : null;
         const isMobile = isIOS || /Android/i.test(navigator.userAgent) || matchMedia("(pointer: coarse)").matches;
         container.className = isMobile ? "unity-mobile" : "unity-desktop";
         canvas.className = isMobile ? "unity-mobile" : "unity-desktop";
@@ -316,7 +310,7 @@
           const bounds = canvas.getBoundingClientRect();
           canvas.width = Math.max(1, Math.round(bounds.width));
           canvas.height = Math.max(1, Math.round(bounds.height));
-          if (isIPhone) beginIOSLaunchGuard(iosRenderPlan.tier);
+          beginIOSLaunchGuard(iosRenderPlan.tier);
         } else if (isMobile) {
           config.devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
         }
@@ -335,10 +329,8 @@
               if (isIOS) {
                 const renderer = enableIOSRetinaRendering(canvas, iosRenderPlan.initialDpr);
                 canvas.dataset.renderPlan = iosRenderPlan.tier;
-                if (isIPhone) {
-                  tuneIPhoneRendering(renderer, iosRenderPlan)
-                    .catch((error) => console.warn("iPhone render tuning failed:", error));
-                }
+                tuneIOSRendering(renderer, iosRenderPlan)
+                  .catch((error) => console.warn("iOS render tuning failed:", error));
               }
               loadingBar.style.display = "none";
               fullscreenButton.addEventListener("click", () => unityInstance.SetFullscreen(1));
