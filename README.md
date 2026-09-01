@@ -14,9 +14,9 @@ Unity WebGL + GitHub Pages + PWA. GitHub Actions chuẩn bị các asset WebGL k
 
 Build nguồn có thể dùng Brotli (`.br`) hoặc Unity Decompression Fallback (`.unityweb`). Asset lớn được chia thành các phần dưới 50 MiB; workflow tự ghép, giải nén và đổi về `.data`/`.wasm`/`.js` trước khi deploy. Cách này tránh bộ giải nén JavaScript giữ đồng thời hai buffer rất lớn trong RAM, đặc biệt quan trọng với Safari trên iPhone/iPad. Website không phụ thuộc `play.unity.com`.
 
-Trên iOS/iPadOS, wrapper không lưu bản sao Unity `.data` vào Cache Storage và luôn khởi tạo ở DPR 1 để giảm đỉnh RAM. Cả iPhone và iPad đều dùng cấu hình thích ứng: thiết bị chưa xác định bắt đầu ở DPR 1.5, thử DPR 1.75 rồi chỉ nâng lên DPR 2 nếu game giữ gần 60 FPS; thiết bị yếu giảm về DPR 1.25. Nếu WebKit bị đóng đột ngột, lần mở sau tự dùng DPR 1.25. Kết quả được ghi nhớ 7 ngày và tự đánh giá lại sau đó. Safari không cung cấp model thiết bị chính xác nên cơ chế này dựa trên khả năng thực tế của thiết bị, không giả định bằng tên model.
+Trên iOS/iPadOS, wrapper không lưu bản sao Unity `.data` vào Cache Storage, khởi tạo ở DPR 1 rồi nâng theo DPR gốc của thiết bị sau khi Unity tải xong, với mức tối đa DPR 2 và ngân sách điểm ảnh. Android tối đa DPR 2; desktop dùng DPR mặc định của trình duyệt. Service worker chỉ cập nhật sau khi game khởi tạo. Cách này giữ hình ảnh sắc nét mà vẫn giảm đỉnh RAM lúc tải, nhưng không thể thay thế việc tối ưu project Unity: nếu `.data` tiếp tục tăng, nên chuyển asset lớn sang Addressables/AssetBundles và chỉ tải khi cần.
 
-Android vẫn tối đa DPR 2; desktop dùng DPR mặc định của trình duyệt. Service worker chỉ cập nhật sau khi game khởi tạo. Cách này giữ hình ảnh sắc nét trên máy khỏe mà vẫn giảm RAM ở máy yếu, nhưng không thể thay thế việc tối ưu project Unity: nếu `.data` tiếp tục tăng, nên chuyển asset lớn sang Addressables/AssetBundles và chỉ tải khi cần.
+Đây là cấu hình DPR baseline phải được giữ nguyên khi nhập mọi ZIP Unity WebGL mới: không tự phân loại thiết bị yếu, không dùng DPR 1.25/1.5/1.75 và không đo FPS để thay đổi độ phân giải.
 
 ## Cách cập nhật game
 

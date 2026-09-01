@@ -46,6 +46,22 @@ for (const entry of deployEntries) {
   await cp(source, destination, { recursive: true });
 }
 
+// Guard the DPR baseline that must survive every future Unity ZIP import.
+// iOS/iPadOS starts at DPR 1, then uses native Retina up to DPR 2; Android is
+// capped at 2, while desktop receives no explicit devicePixelRatio override.
+const wrapperHtml = await readFile(resolve(outputRoot, "index.html"), "utf8");
+for (const marker of [
+  "config.matchWebGLToCanvasSize = false",
+  "Math.min(nativeDpr, 2, budgetDpr)",
+  "config.devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2)",
+  "if (isIOS) enableIOSRetinaRendering(canvas)",
+]) {
+  if (!wrapperHtml.includes(marker)) throw new Error(`DPR baseline marker is missing from index.html: ${marker}`);
+}
+for (const forbidden of ["IOS_RENDER_PROFILE", "measureFrameHealth", "renderTier", "1.25", "1.75"]) {
+  if (wrapperHtml.includes(forbidden)) throw new Error(`Adaptive DPR setting must not be present in index.html: ${forbidden}`);
+}
+
 const assetManifest = JSON.parse(await readFile(resolve(sourceRoot, "unity-assets.json"), "utf8"));
 if (!Array.isArray(assetManifest.assets) || assetManifest.assets.length === 0) {
   throw new Error("unity-assets.json does not contain any Unity build assets.");

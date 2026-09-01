@@ -37,18 +37,13 @@
     <script>
       "use strict";
 
-      const GAME_BUILD_VERSION = "20260901-a06fc6786ef1-iosadaptive2";
-      const IOS_RENDER_PROFILE_VERSION = "20260901-2";
-      const IOS_RENDER_PROFILE_KEY = "phuthuy3d-ios-render-profile";
-      const IOS_LAUNCH_STATE_KEY = "phuthuy3d-ios-launch-state";
-      const IOS_PROFILE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-      const IOS_INTERRUPTED_LAUNCH_TTL_MS = 48 * 60 * 60 * 1000;
+      const GAME_BUILD_VERSION = "20260901-b4301626d332";
       // UNITY_BUILD_CONFIG_START
       const UNITY_BUILD_CONFIG = Object.freeze({
-        "loaderUrl": "Build/phuthuy-mobile7.loader.js",
-        "dataUrl": "Build/phuthuy-mobile7.data",
-        "frameworkUrl": "Build/phuthuy-mobile7.framework.js",
-        "codeUrl": "Build/phuthuy-mobile7.wasm",
+        "loaderUrl": "Build/phuthuy-mobile8.loader.js",
+        "dataUrl": "Build/phuthuy-mobile8.data",
+        "frameworkUrl": "Build/phuthuy-mobile8.framework.js",
+        "codeUrl": "Build/phuthuy-mobile8.wasm",
         "streamingAssetsUrl": "StreamingAssets",
         "companyName": "DefaultCompany",
         "productName": "PhuThuy3D",
@@ -72,90 +67,10 @@
         }
       }
 
-      function readLocalJson(key) {
-        try {
-          return JSON.parse(localStorage.getItem(key) || "null");
-        } catch {
-          return null;
-        }
-      }
-
-      function writeLocalJson(key, value) {
-        try {
-          localStorage.setItem(key, JSON.stringify(value));
-        } catch {
-          // Private browsing or storage pressure can make localStorage fail.
-        }
-      }
-
-      function getIOSRenderPlan() {
-        const now = Date.now();
-        const previousLaunch = readLocalJson(IOS_LAUNCH_STATE_KEY);
-        const previousLaunchWasInterrupted = previousLaunch
-          && previousLaunch.version === IOS_RENDER_PROFILE_VERSION
-          && previousLaunch.complete !== true
-          && now - previousLaunch.startedAt < IOS_INTERRUPTED_LAUNCH_TTL_MS;
-        if (previousLaunchWasInterrupted) {
-          return { tier: "recovery", initialDpr: 1.25, shouldProbe: false };
-        }
-
-        const saved = readLocalJson(IOS_RENDER_PROFILE_KEY);
-        if (saved && saved.version === IOS_RENDER_PROFILE_VERSION && saved.expiresAt > now) {
-          if (saved.tier === "retina") return { tier: "retina", initialDpr: 2, shouldProbe: false };
-          if (saved.tier === "balanced") return { tier: "balanced", initialDpr: 1.5, shouldProbe: true };
-          if (saved.tier === "low") return { tier: "low", initialDpr: 1.25, shouldProbe: false };
-        }
-
-        // Safari intentionally limits exact device identification. Four-core
-        // or older iOS/iPadOS devices use the safe tier immediately; all other
-        // devices start balanced and are promoted only after a live frame test.
-        const logicalCores = Number(navigator.hardwareConcurrency) || 0;
-        if (logicalCores > 0 && logicalCores <= 4) {
-          return { tier: "low", initialDpr: 1.25, shouldProbe: false };
-        }
-        return { tier: "adaptive", initialDpr: 1.5, shouldProbe: true };
-      }
-
-      function rememberIOSRenderTier(tier) {
-        writeLocalJson(IOS_RENDER_PROFILE_KEY, {
-          version: IOS_RENDER_PROFILE_VERSION,
-          tier,
-          expiresAt: Date.now() + IOS_PROFILE_TTL_MS,
-        });
-      }
-
-      function beginIOSLaunchGuard(tier) {
-        writeLocalJson(IOS_LAUNCH_STATE_KEY, {
-          version: IOS_RENDER_PROFILE_VERSION,
-          startedAt: Date.now(),
-          complete: false,
-          tier,
-        });
-
-        // A normal navigation/close should not be mistaken for a WebKit crash.
-        window.addEventListener("pagehide", () => {
-          const state = readLocalJson(IOS_LAUNCH_STATE_KEY);
-          if (state?.version === IOS_RENDER_PROFILE_VERSION) {
-            state.complete = true;
-            writeLocalJson(IOS_LAUNCH_STATE_KEY, state);
-          }
-        });
-        window.addEventListener("pageshow", (event) => {
-          if (!event.persisted) return;
-          const state = readLocalJson(IOS_LAUNCH_STATE_KEY);
-          if (state?.version === IOS_RENDER_PROFILE_VERSION) {
-            state.startedAt = Date.now();
-            state.complete = false;
-            writeLocalJson(IOS_LAUNCH_STATE_KEY, state);
-          }
-        });
-      }
-
-      function enableIOSRetinaRendering(canvas, initialDpr) {
-        // iPhone and iPad start from a device-specific adaptive cap after
-        // Unity's DPR-1 initialization and may change cap at runtime.
+      function enableIOSRetinaRendering(canvas) {
+        // After Unity starts at DPR 1, use the device scale capped at DPR 2 and
+        // by a GPU pixel budget so iPhone/iPad retain their Retina sharpness.
         const MAX_RENDER_PIXELS = 5_800_000;
-        let dprCap = Math.max(1, Math.min(2, initialDpr || 2));
         let resizeTimer;
 
         const resizeRenderTarget = () => {
@@ -164,14 +79,13 @@
           const cssHeight = Math.max(1, bounds.height);
           const nativeDpr = Math.max(1, window.devicePixelRatio || 1);
           const budgetDpr = Math.sqrt(MAX_RENDER_PIXELS / (cssWidth * cssHeight));
-          const renderDpr = Math.max(1, Math.min(nativeDpr, dprCap, budgetDpr));
+          const renderDpr = Math.max(1, Math.min(nativeDpr, 2, budgetDpr));
           const renderWidth = Math.round(cssWidth * renderDpr);
           const renderHeight = Math.round(cssHeight * renderDpr);
 
           if (canvas.width !== renderWidth) canvas.width = renderWidth;
           if (canvas.height !== renderHeight) canvas.height = renderHeight;
           canvas.dataset.renderScale = renderDpr.toFixed(2);
-          canvas.dataset.renderTier = dprCap >= 2 ? "retina" : dprCap <= 1.25 ? "low" : "balanced";
         };
 
         const scheduleResize = () => {
@@ -183,95 +97,6 @@
         window.addEventListener("resize", scheduleResize, { passive: true });
         window.visualViewport?.addEventListener("resize", scheduleResize, { passive: true });
         if ("ResizeObserver" in window) new ResizeObserver(scheduleResize).observe(canvas);
-        return {
-          getDprCap: () => dprCap,
-          setDprCap: (nextDpr) => {
-            dprCap = Math.max(1, Math.min(2, nextDpr));
-            resizeRenderTarget();
-          },
-        };
-      }
-
-      function measureFrameHealth(durationMs = 6000) {
-        return new Promise((resolve) => {
-          const samples = [];
-          const startedAt = performance.now();
-          let previousFrame = 0;
-
-          const sampleFrame = (now) => {
-            if (previousFrame > 0) {
-              const delta = now - previousFrame;
-              // Ignore a background/sleep gap; it does not describe GPU load.
-              if (delta > 0 && delta < 250) samples.push(delta);
-            }
-            previousFrame = now;
-            if (now - startedAt < durationMs) {
-              requestAnimationFrame(sampleFrame);
-              return;
-            }
-
-            if (samples.length < 90) {
-              resolve({ healthy: false, averageFps: 0, longFrameRatio: 1 });
-              return;
-            }
-            const total = samples.reduce((sum, value) => sum + value, 0);
-            const averageFps = 1000 / (total / samples.length);
-            const longFrameRatio = samples.filter((value) => value > 34).length / samples.length;
-            resolve({
-              healthy: averageFps >= 50 && longFrameRatio <= 0.12,
-              averageFps,
-              longFrameRatio,
-            });
-          };
-
-          requestAnimationFrame(sampleFrame);
-        });
-      }
-
-      async function tuneIOSRendering(renderer, plan) {
-        if (plan.tier === "recovery" || plan.tier === "low") {
-          renderer.setDprCap(1.25);
-          rememberIOSRenderTier("low");
-          return;
-        }
-
-        if (plan.tier === "retina") {
-          const health = await measureFrameHealth(7000);
-          if (!health.healthy) {
-            renderer.setDprCap(1.5);
-            rememberIOSRenderTier("balanced");
-          }
-          return;
-        }
-
-        // Ambiguous iPhone/iPad models remain at DPR 1.5 unless the running
-        // Unity game is stable. A candidate Retina promotion is tested again
-        // and reverted if frame pacing degrades.
-        const balancedHealth = await measureFrameHealth(6000);
-        if (!balancedHealth.healthy) {
-          renderer.setDprCap(1.25);
-          rememberIOSRenderTier("low");
-          return;
-        }
-
-        // Step through DPR 1.75 first. Requiring near-60 fps here prevents an
-        // weaker iOS/iPadOS device from jumping straight from 1.5 to 2.
-        renderer.setDprCap(1.75);
-        const candidateHealth = await measureFrameHealth(7000);
-        if (candidateHealth.averageFps < 56 || candidateHealth.longFrameRatio > 0.05) {
-          renderer.setDprCap(1.5);
-          rememberIOSRenderTier("balanced");
-          return;
-        }
-
-        renderer.setDprCap(2);
-        const retinaHealth = await measureFrameHealth(7000);
-        if (retinaHealth.healthy) {
-          rememberIOSRenderTier("retina");
-        } else {
-          renderer.setDprCap(1.5);
-          rememberIOSRenderTier("balanced");
-        }
       }
 
       async function startUnity() {
@@ -285,7 +110,6 @@
 
         const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
           || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-        const iosRenderPlan = isIOS ? getIOSRenderPlan() : null;
         const isMobile = isIOS || /Android/i.test(navigator.userAgent) || matchMedia("(pointer: coarse)").matches;
         container.className = isMobile ? "unity-mobile" : "unity-desktop";
         canvas.className = isMobile ? "unity-mobile" : "unity-desktop";
@@ -310,7 +134,6 @@
           const bounds = canvas.getBoundingClientRect();
           canvas.width = Math.max(1, Math.round(bounds.width));
           canvas.height = Math.max(1, Math.round(bounds.height));
-          beginIOSLaunchGuard(iosRenderPlan.tier);
         } else if (isMobile) {
           config.devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
         }
@@ -326,12 +149,7 @@
               const unityInstance = await createUnityInstance(canvas, config, (progress) => {
                 progressBar.style.width = `${100 * progress}%`;
               });
-              if (isIOS) {
-                const renderer = enableIOSRetinaRendering(canvas, iosRenderPlan.initialDpr);
-                canvas.dataset.renderPlan = iosRenderPlan.tier;
-                tuneIOSRendering(renderer, iosRenderPlan)
-                  .catch((error) => console.warn("iOS render tuning failed:", error));
-              }
+              if (isIOS) enableIOSRetinaRendering(canvas);
               loadingBar.style.display = "none";
               fullscreenButton.addEventListener("click", () => unityInstance.SetFullscreen(1));
               resolve(unityInstance);

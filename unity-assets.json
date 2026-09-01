@@ -1,47 +1,45 @@
 {
-  "version": "20260831-a06fc6786ef1",
-  "generatedAt": "2026-08-31T08:03:32.484Z",
+  "version": "20260901-b4301626d332",
+  "generatedAt": "2026-09-01T05:47:41.219Z",
   "entrypoints": {
-    "loaderUrl": "Build/phuthuy-mobile7.loader.js",
-    "dataUrl": "Build/phuthuy-mobile7.data",
-    "frameworkUrl": "Build/phuthuy-mobile7.framework.js",
-    "codeUrl": "Build/phuthuy-mobile7.wasm"
+    "loaderUrl": "Build/phuthuy-mobile8.loader.js",
+    "dataUrl": "Build/phuthuy-mobile8.data",
+    "frameworkUrl": "Build/phuthuy-mobile8.framework.js",
+    "codeUrl": "Build/phuthuy-mobile8.wasm"
   },
   "assets": [
     {
-      "output": "Build/phuthuy-mobile7.data",
+      "output": "Build/phuthuy-mobile8.data",
       "encoding": "br",
       "parts": [
-        "Build/phuthuy-mobile7.data.unityweb.part001",
-        "Build/phuthuy-mobile7.data.unityweb.part002",
-        "Build/phuthuy-mobile7.data.unityweb.part003",
-        "Build/phuthuy-mobile7.data.unityweb.part004",
-        "Build/phuthuy-mobile7.data.unityweb.part005",
-        "Build/phuthuy-mobile7.data.unityweb.part006"
+        "Build/phuthuy-mobile8.data.unityweb.part001",
+        "Build/phuthuy-mobile8.data.unityweb.part002",
+        "Build/phuthuy-mobile8.data.unityweb.part003",
+        "Build/phuthuy-mobile8.data.unityweb.part004"
       ],
-      "sourceSha256": "148cdaa43310e39c50ef3e47934b7318a7524a8e9576c5058300fbafd87b8495"
+      "sourceSha256": "ffb6abd657b580b1e9d929794046abeff5fcec4e9bc1c58ca744bfefeda4b526"
     },
     {
-      "output": "Build/phuthuy-mobile7.framework.js",
+      "output": "Build/phuthuy-mobile8.framework.js",
       "encoding": "br",
       "parts": [
-        "Build/phuthuy-mobile7.framework.js.unityweb"
+        "Build/phuthuy-mobile8.framework.js.unityweb"
       ],
       "sourceSha256": "e9e3623fc0c15a0a1222d4467940821f50829acefd5acabfb54211dc784f0414"
     },
     {
-      "output": "Build/phuthuy-mobile7.loader.js",
+      "output": "Build/phuthuy-mobile8.loader.js",
       "encoding": "identity",
       "parts": [
-        "Build/phuthuy-mobile7.loader.js"
+        "Build/phuthuy-mobile8.loader.js"
       ],
       "sourceSha256": "a7b6a68632f332cc92d995845b408b06d0af63deed87888fbe5e1fe400e8de0f"
     },
     {
-      "output": "Build/phuthuy-mobile7.wasm",
+      "output": "Build/phuthuy-mobile8.wasm",
       "encoding": "br",
       "parts": [
-        "Build/phuthuy-mobile7.wasm.unityweb"
+        "Build/phuthuy-mobile8.wasm.unityweb"
       ],
       "sourceSha256": "04375d7772f20a70a6d8be064675830e3fa520aaa6a47350235fc4973340bb31"
     }
